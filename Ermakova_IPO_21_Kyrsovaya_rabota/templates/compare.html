@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Сравнение тарифов{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-head row-head">
+        <div>
+            <p class="eyebrow">Сравнение</p>
+            <h1>Сравнение тарифных планов</h1>
+        </div>
+        <a class="btn btn-ghost" href="{{ url_for('index') }}">Вернуться на главную</a>
+    </div>
+    <div class="table-wrap">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>Тариф</th>
+                    <th>Категория</th>
+                    <th>Цена</th>
+                    <th>Интернет</th>
+                    <th>Минуты</th>
+                    <th>SMS</th>
+                    <th>Домашний интернет</th>
+                    <th>Сервисы</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tariff in tariffs %}
+                    <tr>
+                        <td><a href="{{ url_for('tariff_detail', tariff_id=tariff.id) }}">{{ tariff.name }}</a></td>
+                        <td>{{ tariff.category_name }}</td>
+                        <td>{{ tariff.monthly_price }} ₽</td>
+                        <td>{{ 'Безлимит' if tariff.unlimited_mobile else tariff.mobile_gb ~ ' ГБ' }}</td>
+                        <td>{{ tariff.minutes }}</td>
+                        <td>{{ tariff.sms }}</td>
+                        <td>{% if tariff.home_internet_included %}{{ tariff.home_speed_mbps }} Мбит/с{% else %}Нет{% endif %}</td>
+                        <td>{% if tariff.cinema_included %}Кинотеатр {% endif %}{% if tariff.parental_control %}Родительский контроль {% endif %}{% if tariff.spam_protection %}Спам-защита{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

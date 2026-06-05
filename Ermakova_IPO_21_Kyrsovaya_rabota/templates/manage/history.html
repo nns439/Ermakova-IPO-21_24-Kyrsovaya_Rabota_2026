@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}История подборов{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-head">
+        <p class="eyebrow">CRUD</p>
+        <h1>История подборов</h1>
+    </div>
+    <details class="create-panel" open>
+        <summary>Добавить запись истории</summary>
+        <form class="admin-form history-form" method="post">
+            <select name="user_id">
+                <option value="">Гость</option>
+                {% for user in users %}<option value="{{ user.id }}">{{ user.full_name }}</option>{% endfor %}
+            </select>
+            <select name="tariff_id" required>
+                <option value="">Тариф</option>
+                {% for tariff in tariffs %}<option value="{{ tariff.id }}">{{ tariff.name }}</option>{% endfor %}
+            </select>
+            <input type="number" name="desired_price" value="900" placeholder="Цена">
+            <input type="number" name="desired_gb" value="20" placeholder="ГБ">
+            <input type="number" name="desired_minutes" value="600" placeholder="Минуты">
+            <input type="number" name="desired_sms" value="100" placeholder="SMS">
+            <input type="number" name="desired_home_speed" value="100" placeholder="Дом">
+            <select name="preference_category_id">
+                <option value="">Категория</option>
+                {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+            </select>
+            <input type="number" step="0.01" name="score" value="0.8" placeholder="Оценка">
+            <label><input type="checkbox" name="need_unlimited"> Безлимит</label>
+            <label><input type="checkbox" name="need_home_internet"> Домашний интернет</label>
+            <button class="btn" type="submit">Добавить</button>
+        </form>
+    </details>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Пользователь</th>
+                    <th>Тариф</th>
+                    <th>Запрос</th>
+                    <th>Оценка</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                    <tr>
+                        <td>{{ item.created_at }}</td>
+                        <td>{{ item.user_name }}</td>
+                        <td>{{ item.tariff_name }}</td>
+                        <td>{{ item.desired_price }} ₽, {{ item.desired_gb }} ГБ, {{ item.desired_minutes }} мин</td>
+                        <td>{{ "%.0f"|format(item.score * 100) }}%</td>
+                        <td>
+                            <details>
+                                <summary>Изменить</summary>
+                                <form class="inline-edit history-edit" method="post">
+                                    <input type="hidden" name="history_id" value="{{ item.id }}">
+                                    <select name="user_id">
+                                        <option value="">Гость</option>
+                                        {% for user in users %}<option value="{{ user.id }}" {% if item.user_id == user.id %}selected{% endif %}>{{ user.full_name }}</option>{% endfor %}
+                                    </select>
+                                    <select name="tariff_id">
+                                        {% for tariff in tariffs %}<option value="{{ tariff.id }}" {% if item.tariff_id == tariff.id %}selected{% endif %}>{{ tariff.name }}</option>{% endfor %}
+                                    </select>
+                                    <input type="number" name="desired_price" value="{{ item.desired_price }}">
+                                    <input type="number" name="desired_gb" value="{{ item.desired_gb }}">
+                                    <input type="number" name="desired_minutes" value="{{ item.desired_minutes }}">
+                                    <input type="number" name="desired_sms" value="{{ item.desired_sms }}">
+                                    <input type="number" name="desired_home_speed" value="{{ item.desired_home_speed }}">
+                                    <select name="preference_category_id">
+                                        <option value="">Категория</option>
+                                        {% for category in categories %}<option value="{{ category.id }}" {% if item.preference_category_id == category.id %}selected{% endif %}>{{ category.name }}</option>{% endfor %}
+                                    </select>
+                                    <input type="number" step="0.01" name="score" value="{{ item.score }}">
+                                    <label><input type="checkbox" name="need_unlimited" {% if item.need_unlimited %}checked{% endif %}> Безлимит</label>
+                                    <label><input type="checkbox" name="need_home_internet" {% if item.need_home_internet %}checked{% endif %}> Дом</label>
+                                    <button class="btn btn-small" type="submit">ОК</button>
+                                </form>
+                            </details>
+                            <form method="post" action="{{ url_for('history_delete', history_id=item.id) }}">
+                                <button class="link-danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

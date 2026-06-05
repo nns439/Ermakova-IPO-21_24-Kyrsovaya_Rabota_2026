@@ -1,0 +1,14 @@
+services:
+  mts-tariff-app:
+    build: .
+    container_name: mts_tariff_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - mts_sqlite_data:/app/instance
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=change-me-in-production
+
+volumes:
+  mts_sqlite_data:

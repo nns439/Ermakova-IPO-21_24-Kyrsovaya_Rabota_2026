@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Подбор тарифа МТС{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Мобильная связь и домашний интернет</p>
+        <h1>Найдите тариф, который действительно подходит</h1>
+        <p>Укажите бюджет, минуты, интернет и домашнюю скорость. Система оценит тарифы по взвешенной сумме критериев и покажет лучшие варианты.</p>
+        <div class="hero-actions">
+            <a class="btn" href="#selector">Подобрать тариф</a>
+            <a class="btn btn-ghost" href="#catalog">Смотреть каталог</a>
+        </div>
+    </div>
+    <div class="hero-visual" aria-label="Иллюстрация связи">
+        <div class="phone">
+            <span></span>
+            <strong>5G</strong>
+            <small>дом + мобильный</small>
+        </div>
+        <div class="signal signal-one"></div>
+        <div class="signal signal-two"></div>
+    </div>
+</section>
+
+{% if newest %}
+<section class="promo-band">
+    <div>
+        <span class="badge">Новинка</span>
+        <h2>{{ newest.name }}</h2>
+        <p>{{ newest.short_description }}</p>
+    </div>
+    <div class="promo-price">{{ newest.monthly_price }} ₽/мес</div>
+    <a class="btn btn-light" href="{{ url_for('tariff_detail', tariff_id=newest.id) }}">Подробнее</a>
+</section>
+{% endif %}
+
+<section id="selector" class="section">
+    <div class="section-head">
+        <p class="eyebrow">Умный подбор</p>
+        <h2>Параметры клиента</h2>
+    </div>
+    <form class="selector-form" action="{{ url_for('search_results') }}" method="post">
+        <label>Бюджет, ₽/мес
+            <input type="number" name="desired_price" min="100" value="900" required>
+        </label>
+        <label>Мобильный интернет, ГБ
+            <input type="number" name="desired_gb" min="0" value="25">
+        </label>
+        <label>Минуты
+            <input type="number" name="desired_minutes" min="0" value="700">
+        </label>
+        <label>SMS
+            <input type="number" name="desired_sms" min="0" value="100">
+        </label>
+        <label>Скорость дома, Мбит/с
+            <input type="number" name="desired_home_speed" min="0" value="100">
+        </label>
+        <label>Категория
+            <select name="preference_category_id">
+                <option value="">Любая</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="check-line">
+            <input type="checkbox" name="need_unlimited"> Нужен безлимитный мобильный интернет
+        </label>
+        <label class="check-line">
+            <input type="checkbox" name="need_home_internet"> Нужен домашний интернет
+        </label>
+        <button class="btn selector-submit" type="submit">Показать лучшие тарифы</button>
+    </form>
+</section>
+
+<section class="section">
+    <div class="section-head">
+        <p class="eyebrow">Каталог</p>
+        <h2>Поиск и фильтры</h2>
+    </div>
+    <form class="filter-form" action="{{ url_for('index') }}" method="get">
+        <input type="search" name="search" placeholder="Поиск по названию или описанию" value="{{ filters.search }}">
+        <select name="category_id">
+            <option value="">Все категории</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if filters.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="max_price" placeholder="Цена до, ₽" value="{{ filters.max_price or '' }}">
+        <input type="number" name="min_gb" placeholder="Интернет от, ГБ" value="{{ filters.min_gb or '' }}">
+        <label class="check-line compact"><input type="checkbox" name="need_unlimited" value="1" {% if filters.need_unlimited %}checked{% endif %}> Безлимит</label>
+        <label class="check-line compact"><input type="checkbox" name="need_home_internet" value="1" {% if filters.need_home_internet %}checked{% endif %}> Домашний интернет</label>
+        <button class="btn" type="submit">Найти</button>
+    </form>
+</section>
+
+<section id="catalog" class="section">
+    <div class="section-head row-head">
+        <div>
+            <p class="eyebrow">Все тарифы</p>
+            <h2>Полный каталог</h2>
+        </div>
+        <span class="muted">Найдено: {{ tariffs|length }}</span>
+    </div>
+    <form action="{{ url_for('compare') }}" method="get">
+        <div class="card-grid">
+            {% for tariff in tariffs %}
+                <article class="tariff-card">
+                    <div class="card-top">
+                        <span class="badge badge-soft">{{ tariff.category_name }}</span>
+                        {% if tariff.is_new %}<span class="badge">Новинка</span>{% endif %}
+                    </div>
+                    <h3>{{ tariff.name }}</h3>
+                    <p>{{ tariff.short_description }}</p>
+                    <div class="price">{{ tariff.monthly_price }} ₽<span>/мес</span></div>
+                    <ul class="params">
+                        <li>{{ 'Безлимит' if tariff.unlimited_mobile else tariff.mobile_gb ~ ' ГБ' }}</li>
+                        <li>{{ tariff.minutes }} минут</li>
+                        <li>{{ tariff.sms }} SMS</li>
+                        <li>{% if tariff.home_internet_included %}Дом {{ tariff.home_speed_mbps }} Мбит/с{% else %}Без домашнего интернета{% endif %}</li>
+                    </ul>
+                    <p class="services">{{ tariff.services }}</p>
+                    <div class="card-actions">
+                        <label class="compare-check"><input type="checkbox" name="ids" value="{{ tariff.id }}"> Сравнить</label>
+                        <a class="btn btn-small btn-ghost" href="{{ url_for('tariff_detail', tariff_id=tariff.id) }}">Открыть</a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        <button class="floating-compare btn" type="submit">Сравнить выбранные</button>
+    </form>
+</section>
+
+<section class="section">
+    <div class="section-head">
+        <p class="eyebrow">История</p>
+        <h2>Просмотренные тарифы</h2>
+    </div>
+    {% if history %}
+        <div class="history-list">
+            {% for item in history %}
+                <a href="{{ url_for('tariff_detail', tariff_id=item.id) }}">
+                    <span>{{ item.name }}</span>
+                    <strong>{{ item.monthly_price }} ₽/мес</strong>
+                    <small>{{ item.viewed_at }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty">Пока история просмотров пуста. Откройте любой тариф из каталога.</p>
+    {% endif %}
+</section>
+{% endblock %}

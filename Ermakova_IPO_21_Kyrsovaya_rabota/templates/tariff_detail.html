@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ tariff.name }}{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    <div>
+        <span class="badge">{{ tariff.category_name }}</span>
+        <h1>{{ tariff.name }}</h1>
+        <p>{{ tariff.short_description }}</p>
+        <div class="price">{{ tariff.monthly_price }} ₽<span>/мес</span></div>
+    </div>
+    <a class="btn btn-light" href="{{ url_for('compare', ids=tariff.id) }}">Сравнить</a>
+</section>
+
+<section class="section">
+    <div class="metrics">
+        <div><strong>{{ 'Безлимит' if tariff.unlimited_mobile else tariff.mobile_gb ~ ' ГБ' }}</strong><span>мобильный интернет</span></div>
+        <div><strong>{{ tariff.minutes }}</strong><span>минут</span></div>
+        <div><strong>{{ tariff.sms }}</strong><span>SMS</span></div>
+        <div><strong>{% if tariff.home_internet_included %}{{ tariff.home_speed_mbps }}{% else %}0{% endif %}</strong><span>Мбит/с дома</span></div>
+    </div>
+    <div class="detail-grid">
+        <div>
+            <h2>Дополнительные возможности</h2>
+            <p>{{ tariff.services }}</p>
+            <ul class="check-list">
+                <li>{{ 'Кинотеатр включен' if tariff.cinema_included else 'Кинотеатр не включен' }}</li>
+                <li>{{ 'Родительский контроль включен' if tariff.parental_control else 'Без родительского контроля' }}</li>
+                <li>{{ 'Спам-защита включена' if tariff.spam_protection else 'Без спам-защиты' }}</li>
+                <li>{{ tariff.tv_channels }} ТВ-каналов</li>
+            </ul>
+        </div>
+        <div>
+            <h2>Отзывы</h2>
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review">
+                        <strong>{{ review.author }} · {{ review.rating }}/5</strong>
+                        <p>{{ review.comment }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty">Отзывов пока нет.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

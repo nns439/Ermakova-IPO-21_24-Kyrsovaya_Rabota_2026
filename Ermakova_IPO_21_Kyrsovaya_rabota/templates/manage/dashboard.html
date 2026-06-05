@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-head">
+        <p class="eyebrow">Управление</p>
+        <h1>Панель менеджера</h1>
+    </div>
+    <div class="admin-links">
+        <a href="{{ url_for('manage_tariffs') }}">Тарифы</a>
+        <a href="{{ url_for('manage_history') }}">История подборов</a>
+        <a href="{{ url_for('manage_categories') }}">Категории клиентов</a>
+        <a href="{{ url_for('manage_services') }}">Дополнительные услуги</a>
+    </div>
+    <div class="metrics">
+        <div><strong>{{ counts.tariffs }}</strong><span>тарифов</span></div>
+        <div><strong>{{ counts.history }}</strong><span>подборов</span></div>
+        <div><strong>{{ counts.categories }}</strong><span>категорий</span></div>
+        <div><strong>{{ counts.services }}</strong><span>услуг</span></div>
+    </div>
+    <div class="analytics-grid">
+        <div class="analytics-card">
+            <h2>Частота выбора тарифов</h2>
+            {% for item in tariff_frequency %}
+                <div class="bar-row">
+                    <span>{{ item.name }}</span>
+                    <div class="bar"><i style="width: {{ item.total * 20 }}%"></i></div>
+                    <strong>{{ item.total }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="analytics-card">
+            <h2>Распределение предпочтений</h2>
+            {% for item in category_distribution %}
+                <div class="bar-row">
+                    <span>{{ item.name or 'Без категории' }}</span>
+                    <div class="bar dusty"><i style="width: {{ item.total * 20 }}%"></i></div>
+                    <strong>{{ item.total }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

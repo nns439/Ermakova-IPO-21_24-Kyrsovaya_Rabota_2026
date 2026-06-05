@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Вход в аккаунт{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <form class="auth-card" method="post" data-login-form>
+        <p class="eyebrow">Личный кабинет</p>
+        <h1>Вход в аккаунт</h1>
+        <label>Логин
+            <input type="text" name="username" autocomplete="username">
+        </label>
+        <label>Пароль
+            <input type="password" name="password" autocomplete="current-password">
+        </label>
+        <p class="form-warning" data-login-warning hidden>Логин и пароль нельзя оставлять пустыми.</p>
+        <button class="btn" type="submit">Войти</button>
+        <div class="demo-box">
+            <strong>Демо:</strong> admin/admin123, manager/manager123, user/user123
+        </div>
+    </form>
+</section>
+{% endblock %}

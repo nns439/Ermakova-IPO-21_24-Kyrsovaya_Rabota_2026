@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование тарифа' if tariff else 'Новый тариф' }}{% endblock %}
+
+{% block content %}
+<section class="section narrow">
+    <div class="section-head">
+        <p class="eyebrow">CRUD тарифов</p>
+        <h1>{{ 'Редактирование тарифа' if tariff else 'Новый тариф' }}</h1>
+    </div>
+    <form class="admin-form" method="post">
+        <label>Название
+            <input name="name" value="{{ tariff.name if tariff else '' }}" required>
+        </label>
+        <label>Описание
+            <textarea name="short_description" required>{{ tariff.short_description if tariff else '' }}</textarea>
+        </label>
+        <label>Категория
+            <select name="category_id" required>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if tariff and tariff.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="form-grid">
+            <label>Цена, ₽<input type="number" name="monthly_price" value="{{ tariff.monthly_price if tariff else 0 }}" min="1" required></label>
+            <label>ГБ<input type="number" name="mobile_gb" value="{{ tariff.mobile_gb if tariff else 0 }}" min="0"></label>
+            <label>Минуты<input type="number" name="minutes" value="{{ tariff.minutes if tariff else 0 }}" min="0"></label>
+            <label>SMS<input type="number" name="sms" value="{{ tariff.sms if tariff else 0 }}" min="0"></label>
+            <label>Дом, Мбит/с<input type="number" name="home_speed_mbps" value="{{ tariff.home_speed_mbps if tariff else 0 }}" min="0"></label>
+            <label>ТВ-каналы<input type="number" name="tv_channels" value="{{ tariff.tv_channels if tariff else 0 }}" min="0"></label>
+        </div>
+        <div class="check-grid">
+            <label><input type="checkbox" name="unlimited_mobile" {% if tariff and tariff.unlimited_mobile %}checked{% endif %}> Безлимит</label>
+            <label><input type="checkbox" name="home_internet_included" {% if tariff and tariff.home_internet_included %}checked{% endif %}> Домашний интернет</label>
+            <label><input type="checkbox" name="cinema_included" {% if tariff and tariff.cinema_included %}checked{% endif %}> Кинотеатр</label>
+            <label><input type="checkbox" name="parental_control" {% if tariff and tariff.parental_control %}checked{% endif %}> Родительский контроль</label>
+            <label><input type="checkbox" name="spam_protection" {% if not tariff or tariff.spam_protection %}checked{% endif %}> Спам-защита</label>
+            <label><input type="checkbox" name="is_new" {% if tariff and tariff.is_new %}checked{% endif %}> Новинка</label>
+            <label><input type="checkbox" name="is_active" {% if not tariff or tariff.is_active %}checked{% endif %}> Активен</label>
+        </div>
+        <fieldset class="service-fieldset">
+            <legend>Дополнительные услуги</legend>
+            {% for service in services %}
+                <label><input type="checkbox" name="service_ids" value="{{ service.id }}" {% if service.id in selected_services %}checked{% endif %}> {{ service.name }}</label>
+            {% endfor %}
+        </fieldset>
+        <div class="form-actions">
+            <button class="btn" type="submit">Сохранить</button>
+            <a class="btn btn-ghost" href="{{ url_for('manage_tariffs') }}">Назад</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

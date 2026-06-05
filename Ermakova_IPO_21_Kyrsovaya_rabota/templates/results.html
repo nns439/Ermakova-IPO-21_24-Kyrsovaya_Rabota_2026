@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Результаты подбора{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-head row-head">
+        <div>
+            <p class="eyebrow">Результаты поиска</p>
+            <h1>Наиболее подходящие тарифы</h1>
+        </div>
+        <a class="btn btn-ghost" href="{{ url_for('index') }}">Вернуться на главную</a>
+    </div>
+
+    {% if results %}
+        <article class="recommendation">
+            <div>
+                <span class="badge">Рекомендованный тариф</span>
+                <h2>{{ results[0].tariff.name }}</h2>
+                <p>{{ results[0].tariff.short_description }}</p>
+            </div>
+            <div class="score-circle">{{ results[0].percent }}%</div>
+            <div class="price">{{ results[0].tariff.monthly_price }} ₽<span>/мес</span></div>
+        </article>
+
+        <form action="{{ url_for('compare') }}" method="get">
+            <div class="result-list">
+                {% for item in results %}
+                    <article class="result-item">
+                        <label class="compare-check"><input type="checkbox" name="ids" value="{{ item.tariff.id }}" {% if loop.index <= 3 %}checked{% endif %}> Сравнить</label>
+                        <div>
+                            <h3>{{ item.tariff.name }}</h3>
+                            <p>{{ item.tariff.short_description }}</p>
+                            <small>{{ item.tariff.category_name }} · {{ item.tariff.services }}</small>
+                        </div>
+                        <ul class="params inline">
+                            <li>{{ 'Безлимит' if item.tariff.unlimited_mobile else item.tariff.mobile_gb ~ ' ГБ' }}</li>
+                            <li>{{ item.tariff.minutes }} мин</li>
+                            <li>{{ item.tariff.sms }} SMS</li>
+                            <li>{{ item.tariff.monthly_price }} ₽</li>
+                        </ul>
+                        <strong class="match">{{ item.percent }}%</strong>
+                        <a class="btn btn-small btn-ghost" href="{{ url_for('tariff_detail', tariff_id=item.tariff.id) }}">Открыть</a>
+                    </article>
+                {% endfor %}
+            </div>
+            <button class="btn" type="submit">Сравнить похожие тарифы</button>
+        </form>
+    {% else %}
+        <p class="empty">Подходящие тарифы не найдены. Попробуйте изменить параметры.</p>
+    {% endif %}
+</section>
+{% endblock %}

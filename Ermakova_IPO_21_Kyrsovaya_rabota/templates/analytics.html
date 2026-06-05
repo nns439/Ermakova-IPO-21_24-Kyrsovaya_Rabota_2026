@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Аналитика{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-head">
+        <p class="eyebrow">Аналитический модуль</p>
+        <h1>Статистика подборов</h1>
+    </div>
+    <div class="analytics-grid">
+        <div class="analytics-card">
+            <h2>Частота выбора тарифов</h2>
+            {% for item in tariff_frequency %}
+                <div class="bar-row">
+                    <span>{{ item.name }}</span>
+                    <div class="bar"><i style="width: {{ item.total * 20 }}%"></i></div>
+                    <strong>{{ item.total }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="analytics-card">
+            <h2>Распределение предпочтений</h2>
+            {% for item in category_distribution %}
+                <div class="bar-row">
+                    <span>{{ item.name or 'Без категории' }}</span>
+                    <div class="bar dusty"><i style="width: {{ item.total * 20 }}%"></i></div>
+                    <strong>{{ item.total }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
